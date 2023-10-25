@@ -1,6 +1,4 @@
 ﻿
-using System;
-
 namespace lab1.Generators
 {
     public abstract class Generator
@@ -14,10 +12,10 @@ namespace lab1.Generators
             Random random = new();
             List<double> numbers = new();
             for (int i = 0; i < amount; i++)
-            {
                 numbers.Add(GenerateNumber(random));
-            }
             return numbers;
         }
+
+        public abstract double GetFunctionValue(double x);
     }
 }

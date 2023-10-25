@@ -22,5 +22,15 @@ namespace lab1.Generators
             }
             return numbers;
         }
+
+        public override double GetFunctionValue(double x)
+        {
+            return x switch
+            {
+                < 0 => 0,
+                > 1 => 1,
+                _ => x
+            };
+        }
     }
 }
