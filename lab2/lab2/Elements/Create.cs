@@ -4,8 +4,8 @@ namespace lab2.Elements
 {
     public class Create : Element
     {
-        private int _created = 0;
-        public Create(string name, IGenerator delayGenerator) : base(name, delayGenerator) { }
+        private int _created;
+        public Create(string name, IGenerator delayGenerator) : base(name, delayGenerator) => GenerateNextTime();
 
         public override void NextStep()
         {
@@ -15,6 +15,17 @@ namespace lab2.Elements
             GenerateNextTime();
         }
 
-        public override void PrintStatistic() => Console.WriteLine($"{Name}. Created: {_created}, Next time: {NextTime}");
+        public override void PrintStatistic()
+        {
+            Console.Write($"\n{Name}");
+            Console.Write($", Created: {_created}");
+            Console.Write($", Next time: {NextTime}");
+        }
+
+        public override void PrintResults()
+        {
+            Console.Write($"\n{Name}");
+            Console.Write($", Total created: {_created}.");
+        }
     }
 }

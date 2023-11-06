@@ -8,17 +8,17 @@ namespace lab2.Elements
         private readonly IGenerator _delayGenerator;
         private readonly Random _rand = new();
 
-        public double CurrentTime { get; set; } = 0;
-        public double NextTime { get; protected set; }
+        public virtual double CurrentTime { get; set; }
+        public double NextTime { get; protected set; } = double.MaxValue;
 
         private readonly List<(Element? el, int weight)> _nextElements = new();
-        private int _weightSum = 0;
+        private string _movedTo = "";
+        private int _weightSum;
 
         public Element(string name, IGenerator delayGenerator)
         {
             Name = name;
             _delayGenerator = delayGenerator;
-            GenerateNextTime();
         }
 
         public virtual void GenerateNextTime() => NextTime = CurrentTime + _delayGenerator.NextDelay();
@@ -35,18 +35,23 @@ namespace lab2.Elements
         {
             int randVal = _rand.Next(_weightSum);
             int currentWeight = 0;
-            foreach(var (el, weight) in _nextElements)
+            foreach (var (el, weight) in _nextElements)
             {
                 if (randVal <= currentWeight)
+                {
+                    _movedTo = el is null ? "Dispose" : el.Name;
                     return el;
+                }
                 currentWeight += weight;
             }
+            _movedTo = "Dispose";
             return null;
         }
 
         public abstract void NextStep();
         public virtual void MoveTo() { }
-        public virtual void PrintEvent() => Console.WriteLine($"Event happened in {Name}.");
+        public virtual void PrintEvent() => Console.Write($"\nEvent happened in {Name}. Moved to {_movedTo}");
         public abstract void PrintStatistic();
+        public abstract void PrintResults();
     }
 }
