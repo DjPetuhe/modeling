@@ -5,13 +5,13 @@ namespace lab2.Elements
     public class Process : Element
     {
         public readonly int QueueMaxSize;
-        public int QueueSize { get; private set; }
-        public int CountFinished { get; private set; }
-        public bool Working { get; private set; }
-        public int FailureCount { get; private set; }
-        public double QueueSizeSum { get; private set; }
+        public int QueueSize { get; protected set; }
+        public int CountFinished { get; protected set; }
+        public bool FullWorking { get; protected set; }
+        public int FailureCount { get; protected set; }
+        public double QueueSizeSum { get; protected set; }
 
-        private double _currentTime;
+        protected double _currentTime;
         public override double CurrentTime
         {
             get { return _currentTime; }
@@ -29,39 +29,41 @@ namespace lab2.Elements
 
         public override void MoveTo()
         {
-            if (QueueSize >= QueueMaxSize && Working)
+            if (QueueSize >= QueueMaxSize && FullWorking)
             {
                 FailureCount++;
                 return;
             }
-            if (Working)
+            if (FullWorking)
             {
                 QueueSize++;
                 return;
             }
-            Working = true;
-            GenerateNextTime();
+            FullWorking = true;
+            UpdateNextTime();
         }
 
         public override void NextStep()
         {
             CountFinished++;
             Element? next = ChooseNextElement();
-            GenerateNextTime();
             if (QueueSize == 0)
             {
-                Working = false;
+                FullWorking = false;
                 NextTime = double.MaxValue;
             }
             else
+            {
                 QueueSize--;
+                UpdateNextTime();
+            }
             next?.MoveTo();
         }
 
         public override void PrintStatistic()
         {
             Console.Write($"\n{Name}");
-            Console.Write($", Working: {Working}");
+            Console.Write($", Working: {FullWorking}");
             Console.Write($", Queue: {QueueSize}");
             Console.Write($", Failure: {FailureCount}");
             Console.Write($", Next time: {(NextTime == double.MaxValue ? "-" : NextTime)}");
@@ -72,7 +74,7 @@ namespace lab2.Elements
             Console.Write($"\n{Name}");
             Console.Write($", total failures: {FailureCount}");
             Console.Write($", total proceed: {CountFinished}");
-            Console.Write($", failure probability: {(CountFinished == 0 ? 0 : (double)FailureCount / CountFinished)}");
+            Console.Write($", failure probability: {(CountFinished == 0 ? 0 : (double)FailureCount / (FailureCount + CountFinished))}");
             Console.Write($", avarage queue size: {QueueSizeSum / CurrentTime}");
         }
     }

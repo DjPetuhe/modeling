@@ -5,14 +5,14 @@ namespace lab2.Elements
     public class Create : Element
     {
         private int _created;
-        public Create(string name, IGenerator delayGenerator) : base(name, delayGenerator) => GenerateNextTime();
+        public Create(string name, IGenerator delayGenerator) : base(name, delayGenerator) => UpdateNextTime();
 
         public override void NextStep()
         {
             Element? next = ChooseNextElement();
             next?.MoveTo();
             _created++;
-            GenerateNextTime();
+            UpdateNextTime();
         }
 
         public override void PrintStatistic()

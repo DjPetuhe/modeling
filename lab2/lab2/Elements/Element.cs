@@ -12,7 +12,7 @@ namespace lab2.Elements
         public double NextTime { get; protected set; } = double.MaxValue;
 
         private readonly List<(Element? el, int weight)> _nextElements = new();
-        private string _movedTo = "";
+        protected string _movedTo = "";
         private int _weightSum;
 
         public Element(string name, IGenerator delayGenerator)
@@ -21,7 +21,7 @@ namespace lab2.Elements
             _delayGenerator = delayGenerator;
         }
 
-        public virtual void GenerateNextTime() => NextTime = CurrentTime + _delayGenerator.NextDelay();
+        public virtual void UpdateNextTime() => NextTime = CurrentTime + _delayGenerator.NextDelay();
 
         public virtual void AddNextElement(Element? element, int weight)
         {
