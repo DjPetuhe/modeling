@@ -24,9 +24,11 @@ namespace lab3.Elements
 
         public Queue Queue { get; }
         protected Item? WorkingOn { get; set; }
+        public Action<Item>? Addition { get; set; } = null;
 
         public Process(string name, IGenerator delayGenerator, Selector selector, int queueMaxSize)
             : this(name, delayGenerator, selector, new Queue(queueMaxSize)) { }
+
         public Process(string name, IGenerator delayGenerator, Selector selector, Queue queue) 
             : base(name, delayGenerator, selector) => Queue = queue;
 
@@ -51,6 +53,7 @@ namespace lab3.Elements
         {
             CountFinished++;
             Item finishedItem = WorkingOn ?? throw new ArgumentException("Can't finish unexisting item.");
+            Addition?.Invoke(finishedItem);
             if (Queue.IsEmpty)
             {
                 FullWorking = false;
