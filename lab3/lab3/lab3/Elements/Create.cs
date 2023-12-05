@@ -14,6 +14,7 @@ namespace lab3.Elements
         {
             T item = new();
             Element? next = Selector.ChooseNextElement(item);
+            MovedTo = next != null ? next.Name : "Dispose";
             next?.MoveTo(item);
             _created++;
             UpdateNextTime();

@@ -26,11 +26,17 @@ namespace lab3.Elements
         protected Item? WorkingOn { get; set; }
         public Action<Item>? Addition { get; set; } = null;
 
+        public Process(string name, IGenerator delayGenerator, Selector selector, Queue queue)
+            : base(name, delayGenerator, selector) => Queue = queue;
+
         public Process(string name, IGenerator delayGenerator, Selector selector, int queueMaxSize)
             : this(name, delayGenerator, selector, new Queue(queueMaxSize)) { }
 
-        public Process(string name, IGenerator delayGenerator, Selector selector, Queue queue) 
-            : base(name, delayGenerator, selector) => Queue = queue;
+        public Process(string name, IGenerator delayGenerator, Queue queue)
+            : this(name, delayGenerator, new WeightSelector(), queue) { }
+
+        public Process(string name, IGenerator delayGenerator, int queueMaxSize)
+            : this(name, delayGenerator, new Queue(queueMaxSize)) { }
 
         public override void MoveTo(Item item)
         {

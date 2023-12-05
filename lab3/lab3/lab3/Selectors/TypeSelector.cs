@@ -16,11 +16,12 @@ namespace lab3.Selectors
 
         public override Element? ChooseNextElement(Item item)
         {
-            foreach (var el in _nextElements)
+            foreach (var (type, element) in _nextElements)
             {
-                if (el.type == item.Type)
-                    return el.element;
-            }    
+                if (type == item.Type)
+                    return element;
+            }
+            return null;
         }
     }
 }

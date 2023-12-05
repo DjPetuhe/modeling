@@ -4,7 +4,7 @@ namespace lab3
 {
     public class Model
     {
-        private readonly Action<List<Element>>? _addition = null;
+        public Func<List<Element>, bool>? Addition { get; set; } = null;
         private readonly List<Element> _elements;
         private int _step;
         private double _currTime;
@@ -24,8 +24,9 @@ namespace lab3
                 _elements.ForEach(el => el.CurrentTime = _currTime);
                 nextElements = _elements.Where(el => el.NextTime == _currTime).ToList();
                 nextElements.ForEach(el => el.NextStep());
-                _addition?.Invoke(nextElements);
                 PrintSteps(nextElements);
+                if (Addition?.Invoke(_elements) == true)
+                    _elements.ForEach(el => el.PrintStatistic());
                 nextTime = _elements.Min(el => el.NextTime);
             }
             PrintResults();
@@ -36,16 +37,15 @@ namespace lab3
         public void PrintSteps(List<Element> nextElements)
         {
             _step++;
-            Console.Write($"\nStep #{_step}");
+            Console.Write($"\n\nStep #{_step}");
             Console.Write($"\nCurrent time: {_currTime}");
             nextElements.ForEach(el => el.PrintEvent());
             _elements.ForEach(el => el.PrintStatistic());
-            Console.WriteLine();
         }
 
         public void PrintResults()
         {
-            Console.Write("\n" + new string('=', 30) + "RESULT" + new string('=', 30));
+            Console.Write("\n\n" + new string('=', 30) + "RESULT" + new string('=', 30));
             _elements.ForEach(el => el.PrintResults());
             Console.WriteLine();
         }
