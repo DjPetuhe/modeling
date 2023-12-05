@@ -32,5 +32,7 @@ namespace lab3.Elements
             Console.Write($"\n{Name}");
             Console.Write($", Total created: {_created}.");
         }
+
+        public void SetStartingTime(double time) => NextTime = time;
     }
 }

@@ -93,5 +93,12 @@ namespace lab3.Elements
             Console.Write($", failure probability: {(CountFinished == 0 ? 0 : (double)FailureCount / (FailureCount + CountFinished))}");
             Console.Write($", avarage queue size: {Queue.QueueSizeSum / CurrentTime}");
         }
+
+        public virtual void SetStartingWorkingOn(Item item, double finishTime)
+        {
+            WorkingOn = item;
+            FullWorking = true;
+            NextTime = finishTime;
+        }
     }
 }
