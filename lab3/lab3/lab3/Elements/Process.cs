@@ -22,7 +22,7 @@ namespace lab3.Elements
             }
         }
 
-        protected Queue Queue { get; }
+        public Queue Queue { get; }
         protected Item? WorkingOn { get; set; }
 
         public Process(string name, IGenerator delayGenerator, Selector selector, int queueMaxSize)
