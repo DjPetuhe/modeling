@@ -1,6 +1,7 @@
 ﻿using lab3.Items;
 using lab3.Generators;
 using lab3.Selectors;
+using lab3.Queues;
 
 namespace lab3.Elements
 {
@@ -23,15 +24,37 @@ namespace lab3.Elements
             }
         }
 
-        public ComplexProcess(string name, IGenerator delayGenerator, Selector selector, int queueMaxSize, int subProcessesCount) 
-            : base(name, delayGenerator, selector, queueMaxSize)
+        private Action<Item>? _addition = null;
+        public new Action<Item>? Addition 
+        { 
+            get { return _addition; }
+            set 
+            {
+                _addition = value;
+                foreach (Process process in _subProcesses)
+                    process.Addition = _addition;
+            }
+        }
+
+
+        public ComplexProcess(string name, IGenerator delayGenerator, Selector selector, Queue queue, int subProcessesCount) 
+            : base(name, delayGenerator, selector, queue)
         {
             for (int i = 0; i < subProcessesCount; i++)
                 _subProcesses.Add(new($"{i + 1}", delayGenerator, Selector, 0));
         }
 
-        public ComplexProcess(string name, IGenerator delayGenerator, Selector selector, int queueMaxSize, List<Process> subProcess) 
-            : base(name, delayGenerator, selector, queueMaxSize) => _subProcesses = subProcess;
+        public ComplexProcess(string name, IGenerator delayGenerator, Selector selector, Queue queue, List<Process> subProcess) 
+            : base(name, delayGenerator, selector, queue) => _subProcesses = subProcess;
+
+        public ComplexProcess(string name, IGenerator delayGenerator, Selector selector, int queueMaxSize, int subProcessesCount)
+            : this(name, delayGenerator, selector, new Queue(queueMaxSize), subProcessesCount) { }
+
+        public ComplexProcess(string name, IGenerator delayGenerator, Queue queue, int subProcessesCount)
+            : this(name, delayGenerator, new WeightSelector(), queue, subProcessesCount) { }
+
+        public ComplexProcess(string name, IGenerator delayGenerator, int queueMaxSize, int subProcessesCount)
+            : this(name, delayGenerator, new WeightSelector(), new Queue(queueMaxSize), subProcessesCount) { }
 
         public override void MoveTo(Item item)
         {

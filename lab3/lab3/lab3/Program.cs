@@ -1,5 +1,6 @@
 ﻿using lab3;
 using lab3.Items;
+using lab3.Queues;
 using lab3.Elements;
 using lab3.Selectors;
 using lab3.Generators;
@@ -10,7 +11,8 @@ namespace lab2
     {
         public static void Main(string[] args)
         {
-            CarBankModel();
+            //CarBankModel();
+            HospitalModel();
         }
 
         public static void CarBankModel()
@@ -56,6 +58,55 @@ namespace lab2
                 Addition = changeQueue
             };
             mod.Simulate(1000);
+        }
+        
+        public static void HospitalModel()
+        {
+            IGenerator generatorCreate = new ExponentialGenerator(15);
+            IGenerator generatorPathToHospitalRooms = new UniformGenerator(3, 8);
+            IGenerator generatorPathReceptionToLab = new UniformGenerator(2, 5);
+            IGenerator generatorLabRegistry = new ErlangGenerator(3, 4.5);
+            IGenerator generatorLabAnalyse = new ErlangGenerator(2, 4);
+            IGenerator generatorReception = new ExponentialGenerator(15); //own choice
+
+            WeightSelector selectorCreate = new();
+            TypeSelector selectorReception = new();
+            WeightSelector selectorPathReceptionToLab = new();
+            WeightSelector selectorLabRegistry = new();
+            TypeSelector selectorLabAnalyse = new();
+            WeightSelector selectorPathLabToReception = new();
+
+            PriorityQueue queueReception = new(100);
+
+            Create<Patient> create = new("Create", generatorCreate, selectorCreate);
+            ComplexProcess Reception = new("Reception", generatorReception, selectorReception, queueReception, 2);
+            ComplexProcess PathToHospitalRooms = new("PathHospitalRooms", generatorPathToHospitalRooms, 100, 3);
+            ComplexProcess PathReceptionToLab = new("PathReceptionToLab", generatorPathReceptionToLab, selectorPathReceptionToLab, 100, 100);
+            Process LabRegistry = new("LabRegistry", generatorLabRegistry, selectorLabRegistry, 100);
+            ComplexProcess LabAnalyse = new("LabAnalyse", generatorLabAnalyse, selectorLabAnalyse, 100, 2);
+            ComplexProcess PathLabToReception = new("PathLabToReception", generatorPathReceptionToLab, selectorPathLabToReception, 100, 100);
+
+            selectorCreate.AddNextElement(Reception, 1);
+
+            selectorReception.AddElementForType(1, PathToHospitalRooms);
+            selectorReception.AddElementForType(2, PathReceptionToLab);
+            selectorReception.AddElementForType(3, PathReceptionToLab);
+
+            selectorPathReceptionToLab.AddNextElement(LabRegistry, 1);
+
+            selectorLabRegistry.AddNextElement(LabAnalyse, 1);
+
+            selectorLabAnalyse.AddElementForType(2, PathLabToReception);
+            selectorLabAnalyse.AddElementForType(3, null);
+
+            selectorPathLabToReception.AddNextElement(Reception, 1);
+
+            queueReception.AddPriority(1, (Item item) => item.Type == 1);
+
+            PathLabToReception.Addition = (Item item) => item.Type = item.Type == 2 ? 1 : item.Type;
+
+            Model mod = new(new List<Element>() { create, Reception, PathToHospitalRooms, PathReceptionToLab, LabRegistry, LabAnalyse, PathLabToReception });
+            mod.Simulate(10000);
         }
     }
 }
