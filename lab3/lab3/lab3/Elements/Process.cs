@@ -10,6 +10,15 @@ namespace lab3.Elements
         public int CountFinished { get; protected set; }
         public bool FullWorking { get; protected set; }
         public int FailureCount { get; protected set; }
+        public double FailurePercent
+        {
+            get { return CountFinished == 0 ? 0 : Math.Round((double)FailureCount * 100 / (FailureCount + CountFinished), 3); }
+        }
+
+        public double WorkingTimePercent
+        {
+            get { return Math.Round(WorkingTime * 100 / CurrentTime, 3); }
+        }
 
         private double _currentTime;
         public override double CurrentTime
@@ -17,9 +26,17 @@ namespace lab3.Elements
             get { return _currentTime; }
             set
             {
+                if (FullWorking) WorkingTime += value - _currentTime;
                 Queue.UpdateQueueSizeSum(_currentTime, value);
                 _currentTime = value;
             }
+        }
+
+        public double WorkingTime { get; protected set; }
+
+        public int WorkingProcesses
+        {
+            get { return FullWorking ? 1 : 0; }
         }
 
         public Queue Queue { get; }
@@ -73,7 +90,8 @@ namespace lab3.Elements
             }
             Element? next = Selector.ChooseNextElement(finishedItem);
             MovedTo = next != null ? next.Name : "Dispose";
-            next?.MoveTo(finishedItem);
+            if (next == null) Dispose.Destroy(finishedItem, CurrentTime);
+            else next.MoveTo(finishedItem);
         }
 
         public override void PrintStatistic()
@@ -90,8 +108,9 @@ namespace lab3.Elements
             Console.Write($"\n{Name}");
             Console.Write($", total failures: {FailureCount}");
             Console.Write($", total proceed: {CountFinished}");
-            Console.Write($", failure probability: {(CountFinished == 0 ? 0 : (double)FailureCount / (FailureCount + CountFinished))}");
-            Console.Write($", avarage queue size: {Queue.QueueSizeSum / CurrentTime}");
+            Console.Write($", failure percent: {FailurePercent}%");
+            Console.Write($", Working time percent: {WorkingTimePercent}%");
+            Console.Write($", avarage queue size: {Math.Round(Queue.QueueSizeSum / CurrentTime, 3)}");
         }
 
         public virtual void SetStartingWorkingOn(Item item, double finishTime)

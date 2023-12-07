@@ -4,35 +4,56 @@ using lab3.Generators;
 
 namespace lab3.Elements
 {
-    public class Create<T> : Element where T : Item, new()
+    public class Create : Element
     {
-        private int _created;
-        public Create(string name, IGenerator delayGenerator, Selector selector) 
+        public int Created { get; protected set; }
+        public Create(string name, IGenerator delayGenerator, Selector selector)
             : base(name, delayGenerator, selector) => UpdateNextTime();
 
         public override void NextStep()
         {
-            T item = new();
+            Item item = new();
+            Created++;
             Element? next = Selector.ChooseNextElement(item);
             MovedTo = next != null ? next.Name : "Dispose";
-            next?.MoveTo(item);
-            _created++;
+            if (next == null) Dispose.Destroy(item, CurrentTime);
+            else next.MoveTo(item);
             UpdateNextTime();
         }
 
         public override void PrintStatistic()
         {
             Console.Write($"\n{Name}");
-            Console.Write($", Created: {_created}");
+            Console.Write($", Created: {Created}");
             Console.Write($", Next time: {NextTime}");
         }
 
         public override void PrintResults()
         {
             Console.Write($"\n{Name}");
-            Console.Write($", Total created: {_created}.");
+            Console.Write($", Total created: {Created}.");
         }
 
         public void SetStartingTime(double time) => NextTime = time;
+    }
+
+    public class Create<T> : Create where T : Item, new()
+    {
+        public Create(string name, IGenerator delayGenerator, Selector selector)
+            : base(name, delayGenerator, selector) { }
+
+        public override void NextStep()
+        {
+            T item = new()
+            {
+                CreatedTime = CurrentTime
+            };
+            Created++;
+            Element? next = Selector.ChooseNextElement(item);
+            MovedTo = next != null ? next.Name : "Dispose";
+            if (next == null) Dispose.Destroy(item, CurrentTime);
+            else next.MoveTo(item);
+            UpdateNextTime();
+        }
     }
 }

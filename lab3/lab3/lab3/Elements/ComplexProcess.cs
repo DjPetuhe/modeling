@@ -1,7 +1,7 @@
 ﻿using lab3.Items;
-using lab3.Generators;
-using lab3.Selectors;
 using lab3.Queues;
+using lab3.Selectors;
+using lab3.Generators;
 
 namespace lab3.Elements
 {
@@ -17,11 +17,18 @@ namespace lab3.Elements
             get { return _currentTime; }
             set
             {
+                if (PartlyWorking) WorkingTime += value - _currentTime;
+                WorkingSubprocessSum += _subProcesses.Count(p => p.FullWorking) * (value - _currentTime);
                 Queue.UpdateQueueSizeSum(_currentTime, value);
                 _currentTime = value;
                 foreach (Process process in _subProcesses)
                     process.CurrentTime = _currentTime;
             }
+        }
+
+        public new int WorkingProcesses
+        {
+            get { return _subProcesses.Where(p => p.FullWorking).Count(); }
         }
 
         private Action<Item>? _addition = null;
@@ -35,6 +42,8 @@ namespace lab3.Elements
                     process.Addition = _addition;
             }
         }
+
+        public double WorkingSubprocessSum { get; private set; }
 
 
         public ComplexProcess(string name, IGenerator delayGenerator, Selector selector, Queue queue, int subProcessesCount) 
@@ -111,10 +120,16 @@ namespace lab3.Elements
         public override void PrintStatistic()
         {
             Console.Write($"\n{Name}");
-            Console.Write($", Working processes: {_subProcesses.Where(p => p.FullWorking).Count()}");
+            Console.Write($", Working processes: {WorkingProcesses}");
             Console.Write($", Queue: {Queue.QueueSize}");
             Console.Write($", Failure: {FailureCount}");
             Console.Write($", Next time: {(NextTime == double.MaxValue ? "-" : NextTime)}");
+        }
+
+        public override void PrintResults()
+        {
+            base.PrintResults();
+            Console.Write($", Avarage working processes: {WorkingSubprocessSum / _currentTime}");
         }
     }
 }

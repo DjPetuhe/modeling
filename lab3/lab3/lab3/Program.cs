@@ -119,6 +119,7 @@ namespace lab2
 
             Model mod = new(new List<Element>() { create, Reception, PathToHospitalRooms, PathReceptionToLab, LabRegistry, LabAnalyse, PathLabToReception });
             mod.Simulate(10000);
+            mod.PrintHospitalResults();
         }
     }
 }

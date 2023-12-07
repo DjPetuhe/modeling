@@ -7,12 +7,13 @@ namespace lab3.Items
 
         public Patient()
         {
-            Type = _rand.NextDouble() switch
+            InitialType = _rand.NextDouble() switch
             {
                 <= 0.5 => 1,
                 <= 0.6 => 2,
                 _ => 3
             };
+            Type = InitialType;
         }
     }
 }
