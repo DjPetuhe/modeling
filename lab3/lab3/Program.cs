@@ -11,66 +11,66 @@ namespace lab2
     {
         public static void Main(string[] args)
         {
-            CarBankModel();
-            //HospitalModel();
+            //CarBankModel();
+            HospitalModel();
         }
 
-        public static void CarBankModel()
-        {
-            IGenerator generatorCreate = new ExponentialGenerator(0.5);
-            IGenerator generatorCashier = new ExponentialGenerator(0.3);
-            IGenerator generatorStarting = new NormalGenerator(1, 0.3);
-
-            Queue cashier1Qeueu = new(3);
-            cashier1Qeueu.Enqueue(new());
-            cashier1Qeueu.Enqueue(new());
-            Queue cashier2Qeueu = new(3);
-            cashier2Qeueu.Enqueue(new());
-            cashier2Qeueu.Enqueue(new());
-
-            Process cashier1 = new("Cashier1", generatorCashier, cashier1Qeueu);
-            Process cashier2 = new("Cashier2", generatorCashier, cashier2Qeueu);
-
-            cashier1.SetStartingWorkingOn(new(), generatorStarting.NextDelay());
-            cashier2.SetStartingWorkingOn(new(), generatorStarting.NextDelay());
-
-            QueuePrioritySelector createSelector = new();
-            createSelector.AddNextProcess(cashier1);
-            createSelector.AddNextProcess(cashier2);
-            Create<Item> cr = new("Create", generatorCreate, createSelector);
-
-            cr.SetStartingTime(0.1);
-
-            static bool changeQueue(List<Element> elements)
+            public static void CarBankModel()
             {
-                bool swapped = false;
-                List<Process> fullQueue = elements.OfType<Process>().Where(p => p.Queue.QueueSize >= 2).ToList();
-                List<Process> emptyQueue = elements.OfType<Process>().Where(p => p.Queue.QueueSize <= 1).ToList();
-                foreach (var full in fullQueue)
+                IGenerator generatorCreate = new ExponentialGenerator(0.5);
+                IGenerator generatorCashier = new ExponentialGenerator(0.3);
+                IGenerator generatorStarting = new NormalGenerator(1, 0.3);
+
+                Queue cashier1Qeueu = new(3);
+                cashier1Qeueu.Enqueue(new());
+                cashier1Qeueu.Enqueue(new());
+                Queue cashier2Qeueu = new(3);
+                cashier2Qeueu.Enqueue(new());
+                cashier2Qeueu.Enqueue(new());
+
+                Process cashier1 = new("Cashier1", generatorCashier, cashier1Qeueu);
+                Process cashier2 = new("Cashier2", generatorCashier, cashier2Qeueu);
+
+                cashier1.SetStartingWorkingOn(new(), generatorStarting.NextDelay());
+                cashier2.SetStartingWorkingOn(new(), generatorStarting.NextDelay());
+
+                QueuePrioritySelector createSelector = new();
+                createSelector.AddNextProcess(cashier1);
+                createSelector.AddNextProcess(cashier2);
+                Create<Item> cr = new("Create", generatorCreate, createSelector);
+
+                cr.SetStartingTime(0.1);
+
+                static bool changeQueue(List<Element> elements)
                 {
-                    foreach (var empty in emptyQueue)
+                    bool swapped = false;
+                    List<Process> fullQueue = elements.OfType<Process>().Where(p => p.Queue.QueueSize >= 2).ToList();
+                    List<Process> emptyQueue = elements.OfType<Process>().Where(p => p.Queue.QueueSize <= 1).ToList();
+                    foreach (var full in fullQueue)
                     {
-                        if (full.Queue.QueueSize - empty.Queue.QueueSize >= 2)
+                        foreach (var empty in emptyQueue)
                         {
-                            swapped = true;
-                            Console.Write($"\n\nCar moved from {full.Name} queue to {empty.Name} queue\n");
-                            if (empty.Queue.QueueSize == 1)
-                                emptyQueue.Remove(empty);
-                            Item car = full.Queue.Dequeue();
-                            empty.MoveTo(car);
-                            break;
+                            if (full.Queue.QueueSize - empty.Queue.QueueSize >= 2)
+                            {
+                                swapped = true;
+                                Console.Write($"\n\nCar moved from {full.Name} queue to {empty.Name} queue\n");
+                                if (empty.Queue.QueueSize == 1)
+                                    emptyQueue.Remove(empty);
+                                Item car = full.Queue.Dequeue();
+                                empty.MoveTo(car);
+                                break;
+                            }
                         }
                     }
+                    return swapped;
                 }
-                return swapped;
-            }
 
-            Model mod = new(new List<Element>() { cr, cashier1, cashier2 })
-            {
-                Addition = changeQueue
-            };
-            mod.Simulate(100);
-        }
+                Model mod = new(new List<Element>() { cr, cashier1, cashier2 })
+                {
+                    Addition = changeQueue
+                };
+                mod.Simulate(1000);
+            }
         
         public static void HospitalModel()
         {
@@ -118,7 +118,7 @@ namespace lab2
             PathLabToReception.Addition = (Item item) => item.Type = item.Type == 2 ? 1 : item.Type;
 
             Model mod = new(new List<Element>() { create, Reception, PathToHospitalRooms, PathReceptionToLab, LabRegistry, LabAnalyse, PathLabToReception });
-            mod.Simulate(10000);
+            mod.Simulate(1000);
             mod.PrintHospitalResults();
         }
     }
