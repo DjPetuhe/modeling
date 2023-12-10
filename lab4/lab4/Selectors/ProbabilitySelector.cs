@@ -1,7 +1,7 @@
-﻿using lab3.Elements;
-using lab3.Items;
+﻿using lab4.Elements;
+using lab4.Items;
 
-namespace lab3.Selectors
+namespace lab4.Selectors
 {
     public class ProbabilitySelector : Selector
     {

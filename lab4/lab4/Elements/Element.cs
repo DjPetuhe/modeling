@@ -1,8 +1,8 @@
-﻿using lab3.Items;
-using lab3.Selectors;
-using lab3.Generators;
+﻿using lab4.Items;
+using lab4.Selectors;
+using lab4.Generators;
 
-namespace lab3.Elements
+namespace lab4.Elements
 {
     public abstract class Element
     {

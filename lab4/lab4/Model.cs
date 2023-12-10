@@ -1,9 +1,13 @@
 ﻿using lab4.Elements;
+using System.Diagnostics;
 
 namespace lab4
 {
     public class Model
     {
+        public bool IsPrintingSteps { get; set; } = false;
+        public bool IsPrintingResults { get; set; } = false;
+        private readonly Stopwatch _stopwatch = new();
         public Func<List<Element>, bool>? Addition { get; set; } = null;
         private readonly List<Element> _elements;
         private int _additionalEventHappened;
@@ -17,10 +21,11 @@ namespace lab4
 
         public void Simulate(double totalTime)
         {
+            _stopwatch.Start();
             _step = 0;
             _currTime = 0;
             _startingItems = 0;
-            foreach (var el in _elements.OfType<Process>())
+            foreach (var el in _elements.OfType<lab4.Elements.Process>())
             {
                 _startingItems += el.Queue.QueueSize;
                 _startingItems += el.WorkingProcesses;
@@ -40,11 +45,13 @@ namespace lab4
                 EvaluateStatistics();
                 if (Addition?.Invoke(_elements) == true)
                 {
-                    _elements.ForEach(el => el.PrintStatistic());
+                    if (IsPrintingSteps)
+                        _elements.ForEach(el => el.PrintStatistic());
                     _additionalEventHappened++;
                 }
                 nextTime = _elements.Min(el => el.NextTime);
             }
+            _stopwatch.Stop();
             PrintResults();
         }
 
@@ -59,6 +66,8 @@ namespace lab4
         private void PrintSteps(List<Element> nextElements)
         {
             _step++;
+            if (!IsPrintingSteps)
+                return;
             Console.Write($"\n\nStep #{_step}");
             Console.Write($"\nCurrent time: {_currTime}");
             nextElements.ForEach(el => el.PrintEvent());
@@ -67,6 +76,8 @@ namespace lab4
 
         private void PrintResults()
         {
+            if (!IsPrintingResults)
+                return;
             Console.Write("\n\n" + new string('=', 30) + "RESULT" + new string('=', 30));
             _elements.ForEach(el => el.PrintResults());
             int totalCreated = _elements.OfType<Create>().Sum(cr => cr.Created);
@@ -77,14 +88,6 @@ namespace lab4
             Console.WriteLine();
         }
 
-        public void PrintHospitalResults()
-        {
-            Console.Write("\n\n" + new string('=', 30) + "HOSPITAL RESULT BY TYPE" + new string('=', 30));
-            Process lab = _elements.OfType<Process>().First(el => el.Name.Equals("LabRegistry")) ?? throw new Exception("No lab exist");
-            int totalLab = lab.Queue.QueueSize + lab.WorkingProcesses + lab.CountFinished;
-            Console.WriteLine($"\nAvarage time between lab arrival: {_currTime / totalLab}");
-            foreach (int type in Dispose.TotalLifeTimesType.Keys)
-                Console.WriteLine($"Patient type {type} avarage life time: {Dispose.AvarageLifeTimeType(type)}");
-        }
+        public void PrintWorkingTime() => Console.WriteLine($"\nWorking time: {_stopwatch.ElapsedMilliseconds / 1000.0} seconds"); 
     }
 }
