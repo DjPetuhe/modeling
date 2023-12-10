@@ -1,6 +1,5 @@
 ﻿using lab3.Elements;
 
-
 namespace lab3
 {
     public class Model

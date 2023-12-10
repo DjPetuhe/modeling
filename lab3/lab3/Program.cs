@@ -1,18 +1,17 @@
-﻿using lab3;
-using lab3.Items;
+﻿using lab3.Items;
 using lab3.Queues;
 using lab3.Elements;
 using lab3.Selectors;
 using lab3.Generators;
 
-namespace lab2
+namespace lab3
 {
     public class Programm
     {
         public static void Main(string[] args)
         {
-            //CarBankModel();
-            HospitalModel();
+            CarBankModel();
+            //HospitalModel();
         }
 
             public static void CarBankModel()

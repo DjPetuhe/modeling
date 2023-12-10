@@ -5,7 +5,7 @@ namespace lab3.Selectors
 {
     public class TypeSelector : Selector
     {
-        List<(int type, Element? element)> _nextElements = new();
+        private readonly List<(int type, Element? element)> _nextElements = new();
 
         public void AddElementForType(int type, Element? element)
         {
